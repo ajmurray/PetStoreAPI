@@ -1,12 +1,10 @@
 package user;
 
-import org.junit.jupiter.api.Test;
-
 import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.*;
 import static user.common.createUserJSON;
 
 import org.json.simple.JSONObject;
+import org.junit.Test;
 import petstore.PetStoreTest;
 
 public class DeleteUserTest extends PetStoreTest {
@@ -57,6 +55,6 @@ public class DeleteUserTest extends PetStoreTest {
                 .when()
                 .delete(BASEURL)
                 .then()
-                .assertThat().body("code", greaterThanOrEqualTo(400));
+                .assertThat().statusCode(405);
     }
 }

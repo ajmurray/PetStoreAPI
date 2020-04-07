@@ -1,5 +1,7 @@
 package petstore;
 
+import groovy.util.logging.Log4j;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -7,6 +9,7 @@ import java.util.Properties;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
+@Log4j
 public class PetStoreTest {
 
     final static Properties CONFIG = new Properties();
@@ -28,6 +31,7 @@ public class PetStoreTest {
 
     static {
         try {
+
             loadProperties();
         } catch (Throwable t) {
             throw new RuntimeException(t);

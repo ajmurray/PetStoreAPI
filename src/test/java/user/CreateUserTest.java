@@ -1,12 +1,15 @@
 package user;
 
-import org.junit.jupiter.api.Test;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static user.common.createUserJSON;
 
 import org.json.simple.JSONObject;
+import org.junit.Test;
 import petstore.PetStoreTest;
 
 public class CreateUserTest extends PetStoreTest {
@@ -25,106 +28,109 @@ public class CreateUserTest extends PetStoreTest {
         JSONObject requestBody = createUserJSON();
         requestBody.put("username", userToCreate);
 
-        given()
-            .contentType("application/json")
-            .body(requestBody)
-            .when()
-                .post(BASEURL)
-            .then()
-                .assertThat().statusCode(200);
+        RequestSpecification request = given();
+        Response response = request
+                            .contentType("application/json")
+                            .body(requestBody)
+                            .post(BASEURL);
 
-        // check that new user exists
-        given()
-            .contentType("application/json")
-            .when()
-                .get(BASEURL+userToCreate)
-            .then()
-                .assertThat().statusCode(200);
+        int statusCode = response.getStatusCode();
+        assertEquals(200, statusCode);
+
+        // check if created user exists
+        assertEquals(200, get(BASEURL+userToCreate).andReturn().getStatusCode());
     }
 
     @Test
-    public void createUserWithMissingUsernameReturns4xx() {
+    public void createUserWithMissingUsernameDoesNotReturn200() {
 
         JSONObject requestBody = createUserJSON();
         requestBody.remove("username");
 
-        given()
-            .contentType("application/json")
-            .body(requestBody)
-            .when()
-                .post(BASEURL)
-            .then()
-                .assertThat().body("code", greaterThanOrEqualTo(400));
+        RequestSpecification request = given();
+        Response response = request
+                .contentType("application/json")
+                .body(requestBody)
+                .post(BASEURL);
+
+        int statusCode = response.getStatusCode();
+        assertNotEquals(200, statusCode);
     }
 
     @Test
-    public void createUserWithMissingPasswordReturns4xx() {
+    public void createUserWithMissingPasswordDoesNotReturn200() {
 
         JSONObject requestBody = createUserJSON();
         requestBody.remove("password");
 
-        given()
-            .contentType("application/json")
-            .body(requestBody)
-            .when()
-                .post(BASEURL)
-            .then()
-                .assertThat().body("code", greaterThanOrEqualTo(400));
+        RequestSpecification request = given();
+        Response response = request
+                .contentType("application/json")
+                .body(requestBody)
+                .post(BASEURL);
+
+        int statusCode = response.getStatusCode();
+        assertNotEquals(200, statusCode);
     }
 
     @Test
-    public void createUserWithInvalidEmailReturns4xx() {
+    public void createUserWithInvalidEmailDoesNotReturn200() {
 
         JSONObject requestBody = createUserJSON();
         requestBody.put("email", "invalidemail.com");
 
-        given()
-            .contentType("application/json")
-            .body(requestBody)
-            .when()
-                .post(BASEURL)
-            .then()
-                .assertThat().body("code", greaterThanOrEqualTo(400));
+        RequestSpecification request = given();
+        Response response = request
+                .contentType("application/json")
+                .body(requestBody)
+                .post(BASEURL);
+
+        int statusCode = response.getStatusCode();
+        assertNotEquals(200, statusCode);
     }
 
     @Test
-    public void createUserWithMissingRequestBodyReturns4xx() {
+    public void createUserWithMissingRequestBodyDoesNotReturn200() {
 
-        given()
-            .contentType("application/json")
-            .when()
-                .post(BASEURL)
-            .then()
-                .assertThat().body("code", greaterThanOrEqualTo(400));
+        RequestSpecification request = given();
+        Response response = request
+                .contentType("application/json")
+                .post(BASEURL);
+
+        int statusCode = response.getStatusCode();
+        assertNotEquals(200, statusCode);
     }
 
     @Test
-    public void createUserWithInvalidBodyReturns4xx() {
+    public void createUserWithInvalidBodyDoesNotReturn200() {
 
         JSONObject requestBody = new JSONObject();
         requestBody.put("invalid", "invalid");
 
-        given()
+        RequestSpecification request = given();
+        Response response = request
                 .contentType("application/json")
                 .body(requestBody)
-                .when()
-                .post(BASEURL)
-                .then()
-                .assertThat().body("code", greaterThanOrEqualTo(400));
+                .post(BASEURL);
+
+        int statusCode = response.getStatusCode();
+        assertNotEquals(200, statusCode);
     }
 
 
     @Test
-    public void createUserWithPutInsteadOfPostReturns4xx() {
+    public void createUserWithPutInsteadOfPostReturns405() {
 
         JSONObject requestBody = createUserJSON();
 
-        given()
-            .contentType("application/json")
-            .body(requestBody)
-            .when()
-                .put(BASEURL)
-            .then()
-                .assertThat().body("code", greaterThanOrEqualTo(400));
+        RequestSpecification request = given();
+        Response response = request
+                .contentType("application/json")
+                .body(requestBody)
+                .put(BASEURL);
+
+        int statusCode = response.getStatusCode();
+        assertEquals(405, statusCode);
+
     }
 }
